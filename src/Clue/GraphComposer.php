@@ -44,25 +44,32 @@ class GraphComposer
     
     /**
      * 
-     * @param string $dir
+     * @param boolean $showDevPackage
      * @return \Fhaculty\Graph\Graph
      */
-    public function createGraph()
+    public function createGraph($showDevPackage = true)
     {
         $graph = new Graph();
         
         foreach ($this->dependencyGraph->getPackages() as $package) {
             $name = $package->getName();
             $start = $graph->createVertex($name, true);
-            
+
             $label = $name;
             if ($package->getVersion() !== null) {
                 $label .= ': ' . $package->getVersion();
             }
-            
+
             $start->setLayout(array('label' => $label) + $this->layoutVertex);
-        
+
+            $hasOnlyDevDependencies = true;
             foreach ($package->getOutEdges() as $requires) {
+                if (!$showDevPackage && $requires->isDevDependency()) {
+                    continue;
+                }
+
+                $hasOnlyDevDependencies = false;
+
                 $targetName = $requires->getDestPackage()->getName();
                 $target = $graph->createVertex($targetName, true);
                 
@@ -74,25 +81,35 @@ class GraphComposer
                     $edge->setLayout($this->layoutEdgeDev);
                 }
             }
+
+            if (!$showDevPackage && $hasOnlyDevDependencies) {
+                $start->destroy();
+            }
         }
 
         $graph->getVertex($this->dependencyGraph->getRootPackage()->getName())->setLayout($this->layoutVertexRoot);
         
         return $graph;
     }
-        
-    public function displayGraph()
+
+    /**
+     * @param boolean $showDevPackage
+     */
+    public function displayGraph($showDevPackage = true)
     {
-        $graph = $this->createGraph();
+        $graph = $this->createGraph($showDevPackage);
         
         $graphviz = new GraphViz($graph);
         $graphviz->setFormat($this->format);
         $graphviz->display();
     }
-    
-    public function getImagePath()
+
+    /**
+     * @param boolean $showDevPackage
+     */
+    public function getImagePath($showDevPackage = true)
     {
-        $graph = $this->createGraph();
+        $graph = $this->createGraph($showDevPackage);
         
         $graphviz = new GraphViz($graph);
         $graphviz->setFormat($this->format);
