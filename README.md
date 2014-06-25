@@ -24,6 +24,8 @@ $ php graph-composer.phar show ~/path/to/your/project
 *   You may optionally pass an `--format=[svg/svgz/png/jpeg/...]` option to set
     the image type (defaults to `svg`).
 
+*   By default, only the no-dev dependecies is show. If you want to see the dev dependencies you can add the `--dev` option.
+
 ### graph-composer export
 
 The `export` command works very much like the `show` command, but instead of opening your
@@ -46,6 +48,8 @@ $ php graph-composer.phar export ~/path/to/your/project
     
 *   You may optionally pass an `--format=[svg/svgz/png/jpeg/...]` option to set
     the image type (defaults to `svg`).
+
+*   By default, only the no-dev dependecies is show. If you want to see the dev dependencies you can add the `--dev` option.
 
 ## Install
 
